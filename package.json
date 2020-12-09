@@ -2,9 +2,7 @@
   "name": "@hhp1614/log-web",
   "version": "1.0.2",
   "description": "浏览器日志类",
-  "main": "dist/log-web.cjs.js",
-  "module": "dist/log-web.esm.js",
-  "web": "dist/log-web.min.js",
+  "main": "dist/log-web.min.js",
   "webName": "LogWeb",
   "types": "dist/types",
   "scripts": {
