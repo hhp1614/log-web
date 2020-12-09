@@ -1,6 +1,6 @@
 {
   "name": "@hhp1614/log-web",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "浏览器日志类",
   "main": "dist/log-web.min.js",
   "webName": "LogWeb",
