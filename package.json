@@ -25,7 +25,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/hhp1614/utils.git"
+    "url": "https://github.com/hhp1614/log-web.git"
   },
   "devDependencies": {
     "@types/node": "^14.14.6",
