@@ -1,6 +1,6 @@
 {
   "name": "@hhp1614/log-web",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "浏览器日志类",
   "main": "dist/log-web.cjs.js",
   "module": "dist/log-web.esm.js",
@@ -16,7 +16,11 @@
     "prepublishOnly": "rollup -c"
   },
   "private": false,
-  "keywords": ["utils", "browser", "log"],
+  "keywords": [
+    "utils",
+    "browser",
+    "log"
+  ],
   "author": "hhp1614<hhp1614@qq.com>",
   "license": "MIT",
   "repository": {
