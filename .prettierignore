@@ -1,0 +1,4 @@
+node_modules
+tsconfig.json
+# 忽略 lib 目录内的 js 文件
+dist/**/*js

@@ -1,0 +1,30 @@
+{
+  "name": "@hhp1614/log-web",
+  "version": "1.0.0",
+  "description": "浏览器日志类",
+  "main": "dist/log-web.cjs.js",
+  "module": "dist/log-web.esm.js",
+  "web": "dist/log-web.min.js",
+  "webName": "LogWeb",
+  "types": "dist/types",
+  "scripts": {
+    "start": "rollup -c -w",
+    "build": "rollup -c",
+    "prepublishOnly": "rollup -c"
+  },
+  "keywords": [],
+  "author": "hhp1614<hhp1614@qq.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hhp1614/utils.git"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.6",
+    "prettier": "^2.1.2",
+    "rollup": "^2.33.1",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.29.0",
+    "typescript": "^4.0.5"
+  }
+}
