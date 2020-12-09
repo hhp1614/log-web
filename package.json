@@ -2,9 +2,21 @@
   "name": "@hhp1614/log-web",
   "version": "1.0.3",
   "description": "浏览器日志类",
-  "main": "dist/log-web.min.js",
+  "main": "dist/log-web.cjs.js",
+  "module": "dist/log-web.esm.js",
+  "web": "dist/log-web.min.js",
   "webName": "LogWeb",
-  "types": "dist/types",
+  "typings": "dist/types/main.d.ts",
+  "exports": {
+    ".": {
+      "node": {
+        "require": "./dist/log-web.cjs.js",
+        "import": "./dist/log-web.esm.js"
+      },
+      "default": "./dist/log-web.min.js"
+    },
+    "./dist/": "./dist/"
+  },
   "scripts": {
     "start": "rollup -c -w",
     "build": "rollup -c",
