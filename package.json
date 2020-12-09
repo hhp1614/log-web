@@ -10,9 +10,13 @@
   "scripts": {
     "start": "rollup -c -w",
     "build": "rollup -c",
+    "major": "npm version major -m \"Upgrade to %s\"",
+    "minor": "npm version minor -m \"Upgrade to %s\"",
+    "patch": "npm version patch -m \"Upgrade to %s\"",
     "prepublishOnly": "rollup -c"
   },
-  "keywords": [],
+  "private": false,
+  "keywords": ["utils", "browser", "log"],
   "author": "hhp1614<hhp1614@qq.com>",
   "license": "MIT",
   "repository": {
