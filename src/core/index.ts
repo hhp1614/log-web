@@ -2,6 +2,7 @@ import { IConfigMethod, IConfigPrefix, IConfigTag, ILevelConfig, LogMethod } fro
 import { checkFlag, getLogMethod, logMap } from './helper';
 import LogWeb from '../main';
 
+// 打印等级对应的文本和颜色
 const levelMap: ILevelConfig = {
   info: { color: '#3190e8', text: '信息' },
   error: { color: '#ff0000', text: '错误' },
@@ -25,6 +26,10 @@ type Cfg = {
   args: any[];
 };
 
+/**
+ * 打印方法，搜集整理所有的参数
+ * @param params 参数
+ */
 export function print(params: PrintParams) {
   const { target, level, defaultMethod, args } = params;
   const config = logMap.get(target)!;
@@ -37,12 +42,20 @@ export function print(params: PrintParams) {
   checkFlag(target, config);
 }
 
+/**
+ * 打印到控制台
+ * @param cfg 配置
+ */
 function printToConsole(cfg: Cfg) {
   const remark = getRemark(cfg);
   const methodName = cfg.method.name!;
   console[methodName](...remark, ...cfg.args);
 }
 
+/**
+ * 获取打印内容前的说明
+ * @param cfg 配置
+ */
 function getRemark(cfg: Cfg) {
   const level = levelMap[cfg.level];
 
