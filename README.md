@@ -19,26 +19,99 @@ import LogWeb from '@hhp1614/log-web';
 
 const lw = new LogWeb();
 
-// 第一个参数表示打印的 tag，用于分组
-// 第二个开始的其余参数将原样打印到浏览器控制台
-lw.info('tag-info', 'params...');
-lw.error('tag-error', 'params...');
-lw.success('tag-success', 'params...');
-lw.fail('tag-fail', 'params...');
-lw.debug('tag-debug', 'params...');
+lw.info('我是 info 方法');
+lw.error('我是 error 方法');
 ```
 
-## 指定前缀
+### 不同打印等级
+
+一共 5 种输出的方法：`info`、`error`、`success`、`fail`、`debug`
+
+这 5 中输出方法执行时，默认会把当前设置的 `method`、`prefix`、`tag` 清空
+
+如果要保持当前设置的 `method`、`prefix`、`tag` 不被清空，请在设置时将第二个参数设置为 `true`
 
 ```js
-const lw = new LogWeb({ prefix: 'hhp' });
+const lw = new LogWeb();
+
+lw.info('我是 info 方法');
+lw.error('我是 error 方法');
+lw.success('我是 success 方法');
+lw.fail('我是 fail 方法');
+lw.debug('我是 debug 方法');
 ```
 
-## 指定全部打印使用 console 下的同一个方法
+### 链式调用
+
+遇到这 5 种输出方法（`info`、`error`、`success`、`fail`、`debug`）之后，链式调用将终止
+
+简单来说，就是必须以上面的 5 种输出方法结尾，前面不限制调用的**数量**和**顺序**
 
 ```js
-// 'log' | 'info' | 'warn' | 'error' | 'debug'
-const lw = new LogWeb({ method: 'debug' });
+const lw = new LogWeb();
 
-// 接下来 lw 中的所有方法底层都将使用 console.debug() 来打印到控制台
+lw.method('warn').prefix('前缀').tag('标签').info('我是 info 方法');
+lw.info('我是 info 方法');
+```
+
+### 保存指定使用 console 方法
+
+会覆盖底层使用的默认 console 方法
+
+| 输出方法    | 底层使用的方法    |
+| ----------- | ----------------- |
+| `info()`    | `console.info()`  |
+| `error()`   | `console.error()` |
+| `success()` | `console.info()`  |
+| `fail()`    | `console.error()` |
+| `debug()`   | `console.debug()` |
+
+`.method()` 允许设置的方法：`"log"` | `"info"` | `"warn"` | `"error"` | `"debug"`
+
+分别对应 `console` 下的这 5 个方法
+
+```js
+const lw = new LogWeb();
+
+const instance = lw.method('warn', true);
+
+instance.prefix('前缀').tag('标签').info('我是 info 方法');
+instance.tag('标签').info('我是 info 方法');
+instance.info('我是 info 方法');
+instance.error('我是 error 方法');
+instance.success('我是 success 方法');
+instance.fail('我是 fail 方法');
+instance.debug('我是 debug 方法');
+```
+
+### 保存指定前缀
+
+```js
+const lw = new LogWeb();
+
+const instance = lw.prefix('hhp', true);
+
+instance.method('warn').tag('标签1').info('我是 info 方法');
+instance.tag('标签2').info('我是 info 方法');
+instance.info('我是 info 方法');
+instance.error('我是 error 方法');
+instance.success('我是 success 方法');
+instance.fail('我是 fail 方法');
+instance.debug('我是 debug 方法');
+```
+
+### 保存指定标签
+
+```js
+const lw = new LogWeb();
+
+const instance = lw.tag('hhp', true);
+
+instance.method('warn').prefix('前缀').info('我是 info 方法');
+instance.prefix('前缀').info('我是 info 方法');
+instance.info('我是 info 方法');
+instance.error('我是 error 方法');
+instance.success('我是 success 方法');
+instance.fail('我是 fail 方法');
+instance.debug('我是 debug 方法');
 ```
