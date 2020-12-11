@@ -1,7 +1,20 @@
 export declare type LogMethod = 'log' | 'info' | 'warn' | 'error' | 'debug';
 export interface IConfig {
-    prefix?: string;
-    method?: LogMethod;
+    method: IConfigMethod;
+    prefix: IConfigPrefix;
+    tag: IConfigTag;
+}
+export interface IConfigMethod {
+    name?: LogMethod;
+    flag: boolean;
+}
+export interface IConfigPrefix {
+    name?: string;
+    flag: boolean;
+}
+export interface IConfigTag {
+    name?: string;
+    flag: boolean;
 }
 export interface ILevel {
     info: any;
@@ -10,17 +23,14 @@ export interface ILevel {
     fail: any;
     debug: any;
 }
-export interface ILevelFunc extends ILevel {
-    info(tag: string, ...args: any[]): void;
-    error(tag: string, ...args: any[]): void;
-    success(tag: string, ...args: any[]): void;
-    fail(tag: string, ...args: any[]): void;
-    debug(tag: string, ...args: any[]): void;
+export interface ILevelConfigItem {
+    color: string;
+    text: string;
 }
-export interface ILevelColor extends ILevel {
-    info: string;
-    error: string;
-    success: string;
-    fail: string;
-    debug: string;
+export interface ILevelConfig extends ILevel {
+    info: ILevelConfigItem;
+    error: ILevelConfigItem;
+    success: ILevelConfigItem;
+    fail: ILevelConfigItem;
+    debug: ILevelConfigItem;
 }

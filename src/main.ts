@@ -1,63 +1,89 @@
-import { Core } from './core';
-import { IConfig, ILevelFunc } from './types';
+import { LogMethod } from './types';
+import { checkString, logMap, methodDefault, prefixDefault, tagDefault } from './core/helper';
+import { print } from './core';
 
-// LogWeb 实例到 Console 实例的映射，私有化 Console 实例
-const logMap: Map<LogWeb, Core> = new Map();
-
-class LogWeb implements ILevelFunc {
-  /**
-   * 构造函数
-   * @param config 配置
-   * @param [config.prefix] 前缀
-   * @param [config.method] 强制使用指定 console 中对应的方法
-   */
-  constructor(config: IConfig = {}) {
-    logMap.set(this, new Core(config));
+class LogWeb {
+  constructor() {
+    logMap.set(this, { method: methodDefault(), prefix: prefixDefault(), tag: tagDefault() });
   }
 
   /**
-   * 信息
-   * @param tag 标签
-   * @param args 参数
+   * 指定使用 console 下的方法
+   * @param method 方法名称 "log" | "info" | "warn" | "error" | "debug"
+   * @param flag 是否保存，默认在调用输出方法后删除此次设置的 method
    */
-  info(tag: string, ...args: any[]) {
-    logMap.get(this)!.info(tag, args);
+  method(method?: LogMethod, flag = false) {
+    const config = logMap.get(this)!;
+    config.method.name = checkString(method) as LogMethod;
+    config.method.flag = flag;
+    logMap.set(this, config);
+    return this;
   }
 
   /**
-   * 错误
-   * @param tag 标签
-   * @param args 参数
+   * 指定使用的前缀
+   * @param prefix 前缀
+   * @param flag 是否保存，默认在调用输出方法后删除此次设置的 prefix
    */
-  error(tag: string, ...args: any[]) {
-    logMap.get(this)!.error(tag, args);
+  prefix(prefix?: string, flag = false) {
+    const config = logMap.get(this)!;
+    config.prefix.name = checkString(prefix);
+    config.prefix.flag = flag;
+    logMap.set(this, config);
+    return this;
   }
 
   /**
-   * 成功
+   * 指定使用的标签
    * @param tag 标签
-   * @param args 参数
+   * @param flag 是否保存，默认在调用输出方法后删除此次设置的 tag
    */
-  success(tag: string, ...args: any[]) {
-    logMap.get(this)!.success(tag, args);
+  tag(tag?: string, flag = false) {
+    const config = logMap.get(this)!;
+    config.tag.name = checkString(tag);
+    config.tag.flag = flag;
+    logMap.set(this, config);
+    return this;
   }
 
   /**
-   * 失败
-   * @param tag 标签
-   * @param args 参数
+   * 打印信息
+   * @param args 参数，同 console.log() 的参数
    */
-  fail(tag: string, ...args: any[]) {
-    logMap.get(this)!.fail(tag, args);
+  info(...args: any[]) {
+    print({ target: this, defaultMethod: 'info', level: 'info', args });
   }
 
   /**
-   * 调试
-   * @param tag 标签
-   * @param args 参数
+   * 打印错误
+   * @param args 参数，同 console.log() 的参数
    */
-  debug(tag: string, ...args: any[]) {
-    logMap.get(this)!.debug(tag, args);
+  error(...args: any[]) {
+    print({ target: this, defaultMethod: 'error', level: 'error', args });
+  }
+
+  /**
+   * 打印成功信息
+   * @param args 参数，同 console.log() 的参数
+   */
+  success(...args: any[]) {
+    print({ target: this, defaultMethod: 'info', level: 'success', args });
+  }
+
+  /**
+   * 打印失败信息
+   * @param args 参数，同 console.log() 的参数
+   */
+  fail(...args: any[]) {
+    print({ target: this, defaultMethod: 'error', level: 'fail', args });
+  }
+
+  /**
+   * 打印调试信息
+   * @param args 参数，同 console.log() 的参数
+   */
+  debug(...args: any[]) {
+    print({ target: this, defaultMethod: 'debug', level: 'debug', args });
   }
 }
 

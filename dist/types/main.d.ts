@@ -1,41 +1,48 @@
-import { IConfig, ILevelFunc } from './types';
-declare class LogWeb implements ILevelFunc {
+import { LogMethod } from './types';
+declare class LogWeb {
+    constructor();
     /**
-     * 构造函数
-     * @param config 配置
-     * @param [config.prefix] 前缀
-     * @param [config.method] 强制使用指定 console 中对应的方法
+     * 指定使用 console 下的方法
+     * @param method 方法名称 "log" | "info" | "warn" | "error" | "debug"
+     * @param flag 是否保存，默认在调用输出方法后删除此次设置的 method
      */
-    constructor(config?: IConfig);
+    method(method?: LogMethod, flag?: boolean): this;
     /**
-     * 信息
+     * 指定使用的前缀
+     * @param prefix 前缀
+     * @param flag 是否保存，默认在调用输出方法后删除此次设置的 prefix
+     */
+    prefix(prefix?: string, flag?: boolean): this;
+    /**
+     * 指定使用的标签
      * @param tag 标签
-     * @param args 参数
+     * @param flag 是否保存，默认在调用输出方法后删除此次设置的 tag
      */
-    info(tag: string, ...args: any[]): void;
+    tag(tag?: string, flag?: boolean): this;
     /**
-     * 错误
-     * @param tag 标签
-     * @param args 参数
+     * 打印信息
+     * @param args 参数，同 console.log() 的参数
      */
-    error(tag: string, ...args: any[]): void;
+    info(...args: any[]): void;
     /**
-     * 成功
-     * @param tag 标签
-     * @param args 参数
+     * 打印错误
+     * @param args 参数，同 console.log() 的参数
      */
-    success(tag: string, ...args: any[]): void;
+    error(...args: any[]): void;
     /**
-     * 失败
-     * @param tag 标签
-     * @param args 参数
+     * 打印成功信息
+     * @param args 参数，同 console.log() 的参数
      */
-    fail(tag: string, ...args: any[]): void;
+    success(...args: any[]): void;
     /**
-     * 调试
-     * @param tag 标签
-     * @param args 参数
+     * 打印失败信息
+     * @param args 参数，同 console.log() 的参数
      */
-    debug(tag: string, ...args: any[]): void;
+    fail(...args: any[]): void;
+    /**
+     * 打印调试信息
+     * @param args 参数，同 console.log() 的参数
+     */
+    debug(...args: any[]): void;
 }
 export default LogWeb;

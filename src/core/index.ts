@@ -1,47 +1,63 @@
-import { getLogParams } from './helper';
-import { IConfig, LogMethod } from '../types';
+import { IConfigMethod, IConfigPrefix, IConfigTag, ILevelConfig, LogMethod } from '../types';
+import { checkFlag, getLogMethod, logMap } from './helper';
+import LogWeb from '../main';
 
-const logMethod: LogMethod[] = ['log', 'info', 'warn', 'error', 'debug'];
+const levelMap: ILevelConfig = {
+  info: { color: '#3190e8', text: '信息' },
+  error: { color: '#ff0000', text: '错误' },
+  success: { color: '#32b807', text: '成功' },
+  fail: { color: '#e23fff', text: '失败' },
+  debug: { color: '#ffa500', text: '调试' }
+};
 
-export class Core {
-  // 前缀
-  private readonly prefix?: string;
+type PrintParams = {
+  target: LogWeb;
+  defaultMethod: LogMethod;
+  level: keyof ILevelConfig;
+  args: any[];
+};
 
-  // 强制使用指定 console 中对应的方法
-  private readonly method?: LogMethod;
+type Cfg = {
+  level: keyof ILevelConfig;
+  method: IConfigMethod;
+  prefix: IConfigPrefix;
+  tag: IConfigTag;
+  args: any[];
+};
 
-  constructor(config: IConfig) {
-    this.prefix = config.prefix;
-    this.method = config.method;
+export function print(params: PrintParams) {
+  const { target, level, defaultMethod, args } = params;
+  const config = logMap.get(target)!;
+  const { method, prefix, tag } = config;
+
+  method.name = getLogMethod(defaultMethod, method.name);
+
+  printToConsole({ level, method, prefix, tag, args });
+
+  checkFlag(target, config);
+}
+
+function printToConsole(cfg: Cfg) {
+  const remark = getRemark(cfg);
+  const methodName = cfg.method.name!;
+  console[methodName](...remark, ...cfg.args);
+}
+
+function getRemark(cfg: Cfg) {
+  const level = levelMap[cfg.level];
+
+  let formatStr = `%c[${level.text}]`;
+  const styleList = [`color: ${level.color}`];
+
+  if (cfg.prefix.name) {
+    formatStr += `%c[${cfg.prefix.name}]`;
+    styleList.push('color: gray;');
   }
 
-  private print(defaultMethod: LogMethod, params: any[]) {
-    const method = this.method && logMethod.includes(this.method) ? this.method : defaultMethod;
-    console[method](...params);
+  if (cfg.tag.name) {
+    formatStr += `%c[${cfg.tag.name}]`;
+    styleList.push('color: orange;');
   }
 
-  info(tag: string, args: any[]) {
-    const params = getLogParams(this.prefix, 'info', tag, args);
-    this.print('info', params);
-  }
-
-  error(tag: string, args: any[]) {
-    const params = getLogParams(this.prefix, 'error', tag, args);
-    this.print('error', params);
-  }
-
-  success(tag: string, args: any[]) {
-    const params = getLogParams(this.prefix, 'success', tag, args);
-    this.print('log', params);
-  }
-
-  fail(tag: string, args: any[]) {
-    const params = getLogParams(this.prefix, 'fail', tag, args);
-    this.print('error', params);
-  }
-
-  debug(tag: string, args: any[]) {
-    const params = getLogParams(this.prefix, 'debug', tag, args);
-    this.print('debug', params);
-  }
+  return [formatStr, ...styleList];
 }

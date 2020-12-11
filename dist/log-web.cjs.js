@@ -1,5 +1,35 @@
 'use strict';
 
+var logMap = new Map();
+var logMethodList = ['log', 'info', 'warn', 'error', 'debug'];
+var methodDefault = function () { return ({ name: undefined, flag: false }); };
+var prefixDefault = function () { return ({ name: undefined, flag: false }); };
+var tagDefault = function () { return ({ name: undefined, flag: false }); };
+/**
+ * 检查是否为字符串
+ * @description 是字符串，原样返回
+ * @description 非字符串，返回空字符串
+ * @param val 需要检查的值
+ */
+function checkString(val) {
+    return typeof val === 'string' ? val : '';
+}
+function getLogMethod(defaultName, name) {
+    if (logMethodList.includes(name)) {
+        return name;
+    }
+    return defaultName;
+}
+function checkFlag(target, config) {
+    if (!config.method.flag)
+        config.method = methodDefault();
+    if (!config.prefix.flag)
+        config.prefix = prefixDefault();
+    if (!config.tag.flag)
+        config.tag = tagDefault();
+    logMap.set(target, config);
+}
+
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation.
 
@@ -23,162 +53,138 @@ function __spreadArrays() {
     return r;
 }
 
-var levelColor = {
-    info: '#3190e8',
-    error: '#ff0000',
-    success: '#32b807',
-    fail: '#e23fff',
-    debug: '#ffa500'
+var levelMap = {
+    info: { color: '#3190e8', text: '信息' },
+    error: { color: '#ff0000', text: '错误' },
+    success: { color: '#32b807', text: '成功' },
+    fail: { color: '#e23fff', text: '失败' },
+    debug: { color: '#ffa500', text: '调试' }
 };
-/**
- * 获取打印使用的参数
- * @param prefix 前缀
- * @param level 日志等级
- * @param tag 日志标签
- * @param args 参数
- */
-function getLogParams(prefix, level, tag, args) {
-    // 打印等级颜色
-    var color = levelColor[level];
-    // 前缀
-    var prefixStr = prefix ? "%c " + prefix + " " : '';
-    // 格式化字符串
-    var formatStr = prefixStr + "%c " + level + " %c " + tag + " %c\n" + args.map(function () { return '%o'; });
-    // 前缀样式
-    var stylePrefix = 'display: block;' +
-        'padding: 1px;' +
-        'background: gray;' +
-        'color: #ffffff;' +
-        'border-radius: 3px;' +
-        'margin-right: 5px;' +
-        'margin-bottom: 3px;';
-    // 打印等级样式
-    var styleLevel = 'display: block;' +
-        'padding: 1px;' +
-        ("background: " + color + ";") +
-        'color: #ffffff;' +
-        'border-radius: 3px 0 0 3px;' +
-        'margin-bottom: 3px;';
-    // tag 样式
-    var styleTag = 'display: block;' +
-        'padding: 1px;' +
-        'background: gray;' +
-        'color: #ffffff;' +
-        'border-radius: 0 3px 3px 0;' +
-        'margin-bottom: 3px;';
-    // 防止影响后面的打印内容
-    var styleEnd = "background: transparent;";
-    var params = [formatStr];
-    // 如果没有前缀就不使用前缀样式
-    prefix && params.push(stylePrefix);
-    return __spreadArrays(params, [styleLevel, styleTag, styleEnd], args);
+function print(params) {
+    var target = params.target, level = params.level, defaultMethod = params.defaultMethod, args = params.args;
+    var config = logMap.get(target);
+    var method = config.method, prefix = config.prefix, tag = config.tag;
+    method.name = getLogMethod(defaultMethod, method.name);
+    printToConsole({ level: level, method: method, prefix: prefix, tag: tag, args: args });
+    checkFlag(target, config);
+}
+function printToConsole(cfg) {
+    var remark = getRemark(cfg);
+    var methodName = cfg.method.name;
+    console[methodName].apply(console, __spreadArrays(remark, cfg.args));
+}
+function getRemark(cfg) {
+    var level = levelMap[cfg.level];
+    var formatStr = "%c[" + level.text + "]";
+    var styleList = ["color: " + level.color];
+    if (cfg.prefix.name) {
+        formatStr += "%c[" + cfg.prefix.name + "]";
+        styleList.push('color: gray;');
+    }
+    if (cfg.tag.name) {
+        formatStr += "%c[" + cfg.tag.name + "]";
+        styleList.push('color: orange;');
+    }
+    return __spreadArrays([formatStr], styleList);
 }
 
-var logMethod = ['log', 'info', 'warn', 'error', 'debug'];
-var Core = /** @class */ (function () {
-    function Core(config) {
-        this.prefix = config.prefix;
-        this.method = config.method;
-    }
-    Core.prototype.print = function (defaultMethod, params) {
-        var method = this.method && logMethod.includes(this.method) ? this.method : defaultMethod;
-        console[method].apply(console, params);
-    };
-    Core.prototype.info = function (tag, args) {
-        var params = getLogParams(this.prefix, 'info', tag, args);
-        this.print('info', params);
-    };
-    Core.prototype.error = function (tag, args) {
-        var params = getLogParams(this.prefix, 'error', tag, args);
-        this.print('error', params);
-    };
-    Core.prototype.success = function (tag, args) {
-        var params = getLogParams(this.prefix, 'success', tag, args);
-        this.print('log', params);
-    };
-    Core.prototype.fail = function (tag, args) {
-        var params = getLogParams(this.prefix, 'fail', tag, args);
-        this.print('error', params);
-    };
-    Core.prototype.debug = function (tag, args) {
-        var params = getLogParams(this.prefix, 'debug', tag, args);
-        this.print('debug', params);
-    };
-    return Core;
-}());
-
-// LogWeb 实例到 Console 实例的映射，私有化 Console 实例
-var logMap = new Map();
 var LogWeb = /** @class */ (function () {
-    /**
-     * 构造函数
-     * @param config 配置
-     * @param [config.prefix] 前缀
-     * @param [config.method] 强制使用指定 console 中对应的方法
-     */
-    function LogWeb(config) {
-        if (config === void 0) { config = {}; }
-        logMap.set(this, new Core(config));
+    function LogWeb() {
+        logMap.set(this, { method: methodDefault(), prefix: prefixDefault(), tag: tagDefault() });
     }
     /**
-     * 信息
-     * @param tag 标签
-     * @param args 参数
+     * 指定使用 console 下的方法
+     * @param method 方法名称 "log" | "info" | "warn" | "error" | "debug"
+     * @param flag 是否保存，默认在调用输出方法后删除此次设置的 method
      */
-    LogWeb.prototype.info = function (tag) {
-        var args = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            args[_i - 1] = arguments[_i];
-        }
-        logMap.get(this).info(tag, args);
+    LogWeb.prototype.method = function (method, flag) {
+        if (flag === void 0) { flag = false; }
+        var config = logMap.get(this);
+        config.method.name = checkString(method);
+        config.method.flag = flag;
+        logMap.set(this, config);
+        return this;
     };
     /**
-     * 错误
-     * @param tag 标签
-     * @param args 参数
+     * 指定使用的前缀
+     * @param prefix 前缀
+     * @param flag 是否保存，默认在调用输出方法后删除此次设置的 prefix
      */
-    LogWeb.prototype.error = function (tag) {
-        var args = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            args[_i - 1] = arguments[_i];
-        }
-        logMap.get(this).error(tag, args);
+    LogWeb.prototype.prefix = function (prefix, flag) {
+        if (flag === void 0) { flag = false; }
+        var config = logMap.get(this);
+        config.prefix.name = checkString(prefix);
+        config.prefix.flag = flag;
+        logMap.set(this, config);
+        return this;
     };
     /**
-     * 成功
+     * 指定使用的标签
      * @param tag 标签
-     * @param args 参数
+     * @param flag 是否保存，默认在调用输出方法后删除此次设置的 tag
      */
-    LogWeb.prototype.success = function (tag) {
-        var args = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            args[_i - 1] = arguments[_i];
-        }
-        logMap.get(this).success(tag, args);
+    LogWeb.prototype.tag = function (tag, flag) {
+        if (flag === void 0) { flag = false; }
+        var config = logMap.get(this);
+        config.tag.name = checkString(tag);
+        config.tag.flag = flag;
+        logMap.set(this, config);
+        return this;
     };
     /**
-     * 失败
-     * @param tag 标签
-     * @param args 参数
+     * 打印信息
+     * @param args 参数，同 console.log() 的参数
      */
-    LogWeb.prototype.fail = function (tag) {
+    LogWeb.prototype.info = function () {
         var args = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            args[_i - 1] = arguments[_i];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
         }
-        logMap.get(this).fail(tag, args);
+        print({ target: this, defaultMethod: 'info', level: 'info', args: args });
     };
     /**
-     * 调试
-     * @param tag 标签
-     * @param args 参数
+     * 打印错误
+     * @param args 参数，同 console.log() 的参数
      */
-    LogWeb.prototype.debug = function (tag) {
+    LogWeb.prototype.error = function () {
         var args = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            args[_i - 1] = arguments[_i];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
         }
-        logMap.get(this).debug(tag, args);
+        print({ target: this, defaultMethod: 'error', level: 'error', args: args });
+    };
+    /**
+     * 打印成功信息
+     * @param args 参数，同 console.log() 的参数
+     */
+    LogWeb.prototype.success = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        print({ target: this, defaultMethod: 'info', level: 'success', args: args });
+    };
+    /**
+     * 打印失败信息
+     * @param args 参数，同 console.log() 的参数
+     */
+    LogWeb.prototype.fail = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        print({ target: this, defaultMethod: 'error', level: 'fail', args: args });
+    };
+    /**
+     * 打印调试信息
+     * @param args 参数，同 console.log() 的参数
+     */
+    LogWeb.prototype.debug = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        print({ target: this, defaultMethod: 'debug', level: 'debug', args: args });
     };
     return LogWeb;
 }());
