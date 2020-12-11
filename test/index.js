@@ -54,3 +54,11 @@
   instance.debug('我是 debug 方法');
   console.groupEnd();
 }
+{
+  console.group('隐藏打印');
+  const lw1 = new LogWeb({ hide: true });
+  lw1.method('warn').prefix('前缀').tag('标签').info('我是 info 方法');
+  const lw2 = new LogWeb({ hide: false });
+  lw2.method('warn').prefix('前缀').tag('标签').info('我是 info 方法');
+  console.groupEnd();
+}

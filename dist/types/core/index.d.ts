@@ -6,5 +6,9 @@ declare type PrintParams = {
     level: keyof ILevelConfig;
     args: any[];
 };
+/**
+ * 打印方法，搜集整理所有的参数
+ * @param params 参数
+ */
 export declare function print(params: PrintParams): void;
 export {};

@@ -3,6 +3,7 @@ export interface IConfig {
     method: IConfigMethod;
     prefix: IConfigPrefix;
     tag: IConfigTag;
+    hide: boolean;
 }
 export interface IConfigMethod {
     name?: LogMethod;

@@ -1,10 +1,11 @@
-import { LogMethod } from './types';
+import { ILevel, LogMethod } from './types';
 import { checkString, logMap, methodDefault, prefixDefault, tagDefault } from './core/helper';
 import { print } from './core';
 
-class LogWeb {
-  constructor() {
-    logMap.set(this, { method: methodDefault(), prefix: prefixDefault(), tag: tagDefault() });
+class LogWeb implements ILevel {
+  constructor(config: { hide?: boolean } = {}) {
+    const hide = config?.hide!;
+    logMap.set(this, { method: methodDefault(), prefix: prefixDefault(), tag: tagDefault(), hide });
   }
 
   /**

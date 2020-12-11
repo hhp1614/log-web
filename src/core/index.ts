@@ -33,7 +33,10 @@ type Cfg = {
 export function print(params: PrintParams) {
   const { target, level, defaultMethod, args } = params;
   const config = logMap.get(target)!;
-  const { method, prefix, tag } = config;
+  const { method, prefix, tag, hide } = config;
+
+  // 如果设置了隐藏，将不打印到控制台
+  if (hide) return;
 
   method.name = getLogMethod(defaultMethod, method.name);
 

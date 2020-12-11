@@ -115,3 +115,15 @@ instance.success('我是 success 方法');
 instance.fail('我是 fail 方法');
 instance.debug('我是 debug 方法');
 ```
+
+### 隐藏打印
+
+初始化时，可以设置隐藏这个实例的打印，表现为浏览器控制没有输出
+
+```js
+const lw1 = new LogWeb({ hide: true });
+lw1.info('我是隐藏的 info 方法');
+
+const lw2 = new LogWeb({ hide: false });
+lw2.info('我是显示的 info 方法');
+```

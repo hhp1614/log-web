@@ -1,4 +1,6 @@
+// 私有化缓存每一个 LogWeb 实例对应的配置
 var logMap = new Map();
+// 允许使用的 console 下的方法列表
 var logMethodList = ['log', 'info', 'warn', 'error', 'debug'];
 var methodDefault = function () { return ({ name: undefined, flag: false }); };
 var prefixDefault = function () { return ({ name: undefined, flag: false }); };
@@ -12,12 +14,22 @@ var tagDefault = function () { return ({ name: undefined, flag: false }); };
 function checkString(val) {
     return typeof val === 'string' ? val : '';
 }
+/**
+ * 获取 console 下的方法名
+ * @param defaultName 方法名不合法时使用的默认的方法名
+ * @param name 用户指定的方法名
+ */
 function getLogMethod(defaultName, name) {
     if (logMethodList.includes(name)) {
         return name;
     }
     return defaultName;
 }
+/**
+ * 检查设置的 flag，如果 flag 没设置，会把对应的设置恢复成默认
+ * @param target 实例
+ * @param config 配置
+ */
 function checkFlag(target, config) {
     if (!config.method.flag)
         config.method = methodDefault();
@@ -51,6 +63,7 @@ function __spreadArrays() {
     return r;
 }
 
+// 打印等级对应的文本和颜色
 var levelMap = {
     info: { color: '#3190e8', text: '信息' },
     error: { color: '#ff0000', text: '错误' },
@@ -58,19 +71,34 @@ var levelMap = {
     fail: { color: '#e23fff', text: '失败' },
     debug: { color: '#ffa500', text: '调试' }
 };
+/**
+ * 打印方法，搜集整理所有的参数
+ * @param params 参数
+ */
 function print(params) {
     var target = params.target, level = params.level, defaultMethod = params.defaultMethod, args = params.args;
     var config = logMap.get(target);
-    var method = config.method, prefix = config.prefix, tag = config.tag;
+    var method = config.method, prefix = config.prefix, tag = config.tag, hide = config.hide;
+    // 如果设置了隐藏，将不打印到控制台
+    if (hide)
+        return;
     method.name = getLogMethod(defaultMethod, method.name);
     printToConsole({ level: level, method: method, prefix: prefix, tag: tag, args: args });
     checkFlag(target, config);
 }
+/**
+ * 打印到控制台
+ * @param cfg 配置
+ */
 function printToConsole(cfg) {
     var remark = getRemark(cfg);
     var methodName = cfg.method.name;
     console[methodName].apply(console, __spreadArrays(remark, cfg.args));
 }
+/**
+ * 获取打印内容前的说明
+ * @param cfg 配置
+ */
 function getRemark(cfg) {
     var level = levelMap[cfg.level];
     var formatStr = "%c[" + level.text + "]";
@@ -87,8 +115,10 @@ function getRemark(cfg) {
 }
 
 var LogWeb = /** @class */ (function () {
-    function LogWeb() {
-        logMap.set(this, { method: methodDefault(), prefix: prefixDefault(), tag: tagDefault() });
+    function LogWeb(config) {
+        if (config === void 0) { config = {}; }
+        var hide = config === null || config === void 0 ? void 0 : config.hide;
+        logMap.set(this, { method: methodDefault(), prefix: prefixDefault(), tag: tagDefault(), hide: hide });
     }
     /**
      * 指定使用 console 下的方法

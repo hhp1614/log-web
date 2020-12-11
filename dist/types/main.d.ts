@@ -1,6 +1,8 @@
-import { LogMethod } from './types';
-declare class LogWeb {
-    constructor();
+import { ILevel, LogMethod } from './types';
+declare class LogWeb implements ILevel {
+    constructor(config?: {
+        hide?: boolean;
+    });
     /**
      * 指定使用 console 下的方法
      * @param method 方法名称 "log" | "info" | "warn" | "error" | "debug"

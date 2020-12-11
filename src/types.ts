@@ -6,6 +6,7 @@ export interface IConfig {
   method: IConfigMethod;
   prefix: IConfigPrefix;
   tag: IConfigTag;
+  hide: boolean;
 }
 
 // 配置 - 使用 console 的方法
