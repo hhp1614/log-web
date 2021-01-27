@@ -1,23 +1,11 @@
-import {
-  IConfig,
-  IConfigMethod,
-  IConfigPrefix,
-  IConfigTag,
-  LogMethod
-} from '../types'
+import { IConfig, IConfigMethod, IConfigPrefix, IConfigTag, LogMethod } from '../types'
 import LogWeb from '../main'
 
 // 私有化缓存每一个 LogWeb 实例对应的配置
 export const logMap: Map<LogWeb, IConfig> = new Map()
 
 // 允许使用的 console 下的方法列表
-export const logMethodList: LogMethod[] = [
-  'log',
-  'info',
-  'warn',
-  'error',
-  'debug'
-]
+export const logMethodList: LogMethod[] = ['log', 'info', 'warn', 'error', 'debug']
 
 export const methodDefault = (): IConfigMethod => ({
   name: undefined,
@@ -44,10 +32,7 @@ export function checkString(val: any) {
  * @param defaultName 方法名不合法时使用的默认的方法名
  * @param name 用户指定的方法名
  */
-export function getLogMethod(
-  defaultName: LogMethod,
-  name?: LogMethod
-): LogMethod {
+export function getLogMethod(defaultName: LogMethod, name?: LogMethod): LogMethod {
   if (logMethodList.includes(name!)) {
     return name!
   }

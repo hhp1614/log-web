@@ -1,10 +1,4 @@
-import {
-  IConfigMethod,
-  IConfigPrefix,
-  IConfigTag,
-  ILevelConfig,
-  LogMethod
-} from '../types'
+import { IConfigMethod, IConfigPrefix, IConfigTag, ILevelConfig, LogMethod } from '../types'
 import { checkFlag, getLogMethod, logMap } from './helper'
 import LogWeb from '../main'
 

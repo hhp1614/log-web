@@ -1,11 +1,5 @@
 import { ILevel, LogMethod } from './types'
-import {
-  checkString,
-  logMap,
-  methodDefault,
-  prefixDefault,
-  tagDefault
-} from './core/helper'
+import { checkString, logMap, methodDefault, prefixDefault, tagDefault } from './core/helper'
 import { print } from './core'
 
 class LogWeb implements ILevel {
