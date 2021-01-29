@@ -1,16 +1,16 @@
-import { ILevel, LogMethod } from './types'
-import { checkString, logMap, methodDefault, prefixDefault, tagDefault } from './core/helper'
-import { print } from './core'
+import { ILevel, LogMethod } from './types';
+import { checkString, logMap, methodDefault, prefixDefault, tagDefault } from './core/helper';
+import { print } from './core';
 
 class LogWeb implements ILevel {
   constructor(config: { hide?: boolean } = {}) {
-    const hide = config?.hide!
+    const hide = config?.hide!;
     logMap.set(this, {
       method: methodDefault(),
       prefix: prefixDefault(),
       tag: tagDefault(),
       hide
-    })
+    });
   }
 
   /**
@@ -19,11 +19,11 @@ class LogWeb implements ILevel {
    * @param flag 是否保存，默认在调用输出方法后删除此次设置的 method
    */
   method(method?: LogMethod, flag = false) {
-    const config = logMap.get(this)!
-    config.method.name = checkString(method) as LogMethod
-    config.method.flag = flag
-    logMap.set(this, config)
-    return this
+    const config = logMap.get(this)!;
+    config.method.name = checkString(method) as LogMethod;
+    config.method.flag = flag;
+    logMap.set(this, config);
+    return this;
   }
 
   /**
@@ -32,11 +32,11 @@ class LogWeb implements ILevel {
    * @param flag 是否保存，默认在调用输出方法后删除此次设置的 prefix
    */
   prefix(prefix?: string, flag = false) {
-    const config = logMap.get(this)!
-    config.prefix.name = checkString(prefix)
-    config.prefix.flag = flag
-    logMap.set(this, config)
-    return this
+    const config = logMap.get(this)!;
+    config.prefix.name = checkString(prefix);
+    config.prefix.flag = flag;
+    logMap.set(this, config);
+    return this;
   }
 
   /**
@@ -45,11 +45,11 @@ class LogWeb implements ILevel {
    * @param flag 是否保存，默认在调用输出方法后删除此次设置的 tag
    */
   tag(tag?: string, flag = false) {
-    const config = logMap.get(this)!
-    config.tag.name = checkString(tag)
-    config.tag.flag = flag
-    logMap.set(this, config)
-    return this
+    const config = logMap.get(this)!;
+    config.tag.name = checkString(tag);
+    config.tag.flag = flag;
+    logMap.set(this, config);
+    return this;
   }
 
   /**
@@ -57,7 +57,7 @@ class LogWeb implements ILevel {
    * @param args 参数，同 console.log() 的参数
    */
   info(...args: any[]) {
-    print({ target: this, defaultMethod: 'info', level: 'info', args })
+    print({ target: this, defaultMethod: 'info', level: 'info', args });
   }
 
   /**
@@ -65,7 +65,7 @@ class LogWeb implements ILevel {
    * @param args 参数，同 console.log() 的参数
    */
   error(...args: any[]) {
-    print({ target: this, defaultMethod: 'error', level: 'error', args })
+    print({ target: this, defaultMethod: 'error', level: 'error', args });
   }
 
   /**
@@ -73,7 +73,7 @@ class LogWeb implements ILevel {
    * @param args 参数，同 console.log() 的参数
    */
   success(...args: any[]) {
-    print({ target: this, defaultMethod: 'info', level: 'success', args })
+    print({ target: this, defaultMethod: 'info', level: 'success', args });
   }
 
   /**
@@ -81,7 +81,7 @@ class LogWeb implements ILevel {
    * @param args 参数，同 console.log() 的参数
    */
   fail(...args: any[]) {
-    print({ target: this, defaultMethod: 'error', level: 'fail', args })
+    print({ target: this, defaultMethod: 'error', level: 'fail', args });
   }
 
   /**
@@ -89,8 +89,8 @@ class LogWeb implements ILevel {
    * @param args 参数，同 console.log() 的参数
    */
   debug(...args: any[]) {
-    print({ target: this, defaultMethod: 'debug', level: 'debug', args })
+    print({ target: this, defaultMethod: 'debug', level: 'debug', args });
   }
 }
 
-export default LogWeb
+export default LogWeb;
